@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+work/frontend/node_modules/
+
+# Build output
+work/frontend/dist/
+work/frontend/.vite/
+
+# Go
+work/backend/server
+work/backend/tmp/
+
+# Environment files (contains secrets)
+.env
+work/frontend/.env
+work/backend/.env
+work/backend/firebase-credentials.json
+
+# Firebase
+.firebase/
+work/.firebase/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log

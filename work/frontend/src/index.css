@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #36393f transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #36393f;
+    border-radius: 3px;
+  }
+
+  body {
+    @apply bg-app-bg text-app-text-primary font-sans;
+  }
+}
+
+@layer utilities {
+  .text-app-text-primary {
+    color: #d1d2d3;
+  }
+  .text-app-text-muted {
+    color: #72767d;
+  }
+  .bg-app-bg {
+    background-color: #1a1d21;
+  }
+  .bg-app-surface {
+    background-color: #222529;
+  }
+  .bg-app-surface-hover {
+    background-color: #2a2d31;
+  }
+  .border-app-border {
+    border-color: #36393f;
+  }
+}
+
+/* FullCalendar カスタムスタイル */
+.fc {
+  --fc-border-color: #36393f;
+  --fc-button-bg-color: #222529;
+  --fc-button-border-color: #36393f;
+  --fc-button-hover-bg-color: #2a2d31;
+  --fc-button-hover-border-color: #5865f2;
+  --fc-button-active-bg-color: #5865f2;
+  --fc-button-active-border-color: #5865f2;
+  --fc-today-bg-color: rgba(88, 101, 242, 0.1);
+  --fc-page-bg-color: #1a1d21;
+  --fc-neutral-bg-color: #222529;
+  --fc-list-event-hover-bg-color: #2a2d31;
+  --fc-event-bg-color: #5865f2;
+  --fc-event-border-color: #5865f2;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-color: #36393f;
+}
+
+.fc-col-header-cell {
+  background-color: #222529;
+  color: #72767d;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 0;
+}
+
+.fc-daygrid-day {
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #2a2d31;
+}
+
+.fc-daygrid-day-number {
+  color: #d1d2d3;
+  font-size: 0.875rem;
+  padding: 4px 6px;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  background-color: #5865f2;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.fc-toolbar-title {
+  color: #d1d2d3;
+  font-size: 1.1rem !important;
+  font-weight: 600;
+}
+
+.fc-button {
+  font-size: 0.8rem !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  color: #d1d2d3 !important;
+}
+
+.fc-button:focus {
+  box-shadow: none !important;
+}

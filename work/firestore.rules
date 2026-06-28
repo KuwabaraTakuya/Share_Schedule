@@ -1,0 +1,100 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ユーザーは自分のデータのみ読み書き可
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // コミュニティ: メンバーのみアクセス可
+    match /communities/{communityId} {
+      function isMember() {
+        return request.auth != null &&
+          exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
+      }
+
+      function getMemberRole() {
+        return get(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid)).data.role;
+      }
+
+      function isAdminOrOwner() {
+        return isMember() && (getMemberRole() == 'admin' || getMemberRole() == 'owner');
+      }
+
+      allow read: if isMember();
+      allow create: if request.auth != null;
+      allow update: if isAdminOrOwner();
+      allow delete: if isMember() && getMemberRole() == 'owner';
+
+      // メンバーサブコレクション
+      match /members/{memberId} {
+        allow read: if isMember();
+        // メンバー追加・変更・削除はバックエンドAPIのみ（Admin SDK経由）
+        allow write: if false;
+      }
+    }
+
+    // チャンネル: コミュニティメンバーのみ
+    match /channels/{channelId} {
+      function isCommunityMember() {
+        let communityId = resource.data.communityId;
+        return request.auth != null &&
+          exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
+      }
+
+      function isCommunityMemberForNew() {
+        let communityId = request.resource.data.communityId;
+        return request.auth != null &&
+          exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
+      }
+
+      allow read: if isCommunityMember();
+      // チャンネル作成・削除はAdminのみ（バックエンド経由で実施）
+      allow create: if isCommunityMemberForNew();
+      allow update: if isCommunityMember();
+      allow delete: if false; // バックエンドAPI経由のみ
+
+      // メッセージサブコレクション
+      match /messages/{messageId} {
+        allow read: if isCommunityMember();
+        // メッセージ送信はメンバーであれば可
+        allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+        // 編集・削除は本人のみ（管理者はバックエンドAPI経由）
+        allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+        allow delete: if false; // 論理削除のみ（バックエンドで実施）
+      }
+    }
+
+    // カレンダーイベント
+    match /events/{eventId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == resource.data.userId;
+      }
+
+      function canRead() {
+        if request.auth == null { return false; }
+        // 自分のイベントは常に読める
+        if request.auth.uid == resource.data.userId { return true; }
+        // コミュニティ公開設定のイベントはコミュニティメンバーが読める
+        if resource.data.visibility == 'community' {
+          let communityId = resource.data.communityId;
+          return communityId != null &&
+            exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
+        }
+        return false;
+      }
+
+      allow read: if canRead();
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isOwner();
+    }
+
+    // 可用性キャッシュ: バックエンドのみ書き込み可（クライアントは読み取りのみ）
+    match /availability_cache/{cacheId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin SDK経由のみ
+    }
+  }
+}
