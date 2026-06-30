@@ -7,6 +7,7 @@ import CalendarPage from './pages/CalendarPage'
 import ChatPage from './pages/ChatPage'
 import PersonalCalendarPage from './pages/PersonalCalendarPage'
 import SearchPage from './pages/SearchPage'
+import WelcomePage from './pages/WelcomePage'
 import LoadingSpinner from './components/common/LoadingSpinner'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -42,7 +43,7 @@ export default function App() {
           }
         >
           <Route path="/" element={<Navigate to="/c" replace />} />
-          <Route path="/c" element={<div className="flex h-full items-center justify-center text-app-text-muted">コミュニティを選択してください</div>} />
+          <Route path="/c" element={<WelcomePage />} />
           <Route path="/c/:communityId" element={<CalendarPage />} />
           <Route path="/c/:communityId/ch/:channelId" element={<ChatPage />} />
           <Route path="/c/:communityId/calendar" element={<PersonalCalendarPage />} />

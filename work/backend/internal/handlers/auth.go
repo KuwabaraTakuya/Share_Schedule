@@ -39,12 +39,11 @@ func (h *AuthHandler) Verify(c *fiber.Ctx) error {
 
 	// 新規ユーザー作成
 	now := time.Now()
-	emailStr, _ := email.(string)
 
 	newUser := &models.User{
 		ID:          uid,
-		DisplayName: emailStr,
-		Email:       emailStr,
+		DisplayName: email,
+		Email:       email,
 		AvatarURL:   "",
 		Timezone:    "Asia/Tokyo",
 		CreatedAt:   now,

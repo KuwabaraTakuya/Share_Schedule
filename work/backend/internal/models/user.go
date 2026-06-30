@@ -3,14 +3,15 @@ package models
 import "time"
 
 type User struct {
-	ID          string    `json:"id" firestore:"id"`
-	DisplayName string    `json:"displayName" firestore:"displayName"`
-	Email       string    `json:"email" firestore:"email"`
-	AvatarURL   string    `json:"avatarUrl" firestore:"avatarUrl"`
-	Timezone    string    `json:"timezone" firestore:"timezone"`
-	CreatedAt   time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt" firestore:"updatedAt"`
-	Settings    UserSettings `json:"settings" firestore:"settings"`
+	ID           string       `json:"id" firestore:"id"`
+	DisplayName  string       `json:"displayName" firestore:"displayName"`
+	Email        string       `json:"email" firestore:"email"`
+	AvatarURL    string       `json:"avatarUrl" firestore:"avatarUrl"`
+	Timezone     string       `json:"timezone" firestore:"timezone"`
+	CommunityIDs []string     `json:"communityIds" firestore:"communityIds"`
+	CreatedAt    time.Time    `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt    time.Time    `json:"updatedAt" firestore:"updatedAt"`
+	Settings     UserSettings `json:"settings" firestore:"settings"`
 }
 
 type UserSettings struct {

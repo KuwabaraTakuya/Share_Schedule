@@ -125,6 +125,7 @@ export default function ChannelList({ communityId, channels }: ChannelListProps)
   const currentMember = communityMembers.find((m) => m.userId === user?.id)
   const canManage =
     currentMember?.role === 'owner' || currentMember?.role === 'admin'
+  const isMember = !!currentMember
 
   const handleCreateChannel = async () => {
     if (!newChannelName.trim()) return
@@ -166,17 +167,15 @@ export default function ChannelList({ communityId, channels }: ChannelListProps)
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* コミュニティ名 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-app-border">
-        <span className="font-semibold text-app-text-primary text-sm truncate">
-          {communityMembers.length > 0
-            ? 'チャンネル'
-            : 'チャンネル'}
+      {/* チャンネルヘッダー */}
+      <div className="flex items-center justify-between px-3 py-2">
+        <span className="text-xs font-semibold uppercase tracking-wide text-app-text-muted">
+          チャンネル
         </span>
-        {canManage && (
+        {isMember && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="text-app-text-muted hover:text-app-text-primary"
+            className="text-app-text-muted hover:text-app-text-primary transition-colors"
             title="チャンネルを作成"
           >
             <PlusIcon className="h-4 w-4" />

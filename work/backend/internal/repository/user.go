@@ -55,3 +55,10 @@ func (r *UserRepository) AddFCMToken(ctx context.Context, uid, token string) err
 	})
 	return err
 }
+
+func (r *UserRepository) AddCommunityID(ctx context.Context, uid, communityID string) error {
+	_, err := r.repo.Collection("users").Doc(uid).Update(ctx, []firestore.Update{
+		{Path: "communityIds", Value: firestore.ArrayUnion(communityID)},
+	})
+	return err
+}

@@ -27,11 +27,21 @@ func NewCommunityHandler(
 
 func (h *CommunityHandler) GetAll(c *fiber.Ctx) error {
 	uid := middleware.GetUID(c)
-	// TODO: ユーザーが所属するコミュニティを取得（membership インデックスを使う）
-	// 現在はFirestoreのサブコレクション検索のため、バックエンドで全コミュニティをスキャンするのは非効率
-	// 本番では users/{uid}/communityIds フィールドを使うことを推奨
-	_ = uid
-	return c.JSON([]models.Community{})
+
+	user, err := h.userRepo.GetByID(c.Context(), uid)
+	if err != nil || user == nil || len(user.CommunityIDs) == 0 {
+		return c.JSON([]models.Community{})
+	}
+
+	communities := make([]*models.Community, 0, len(user.CommunityIDs))
+	for _, communityID := range user.CommunityIDs {
+		community, err := h.communityRepo.GetByID(c.Context(), communityID)
+		if err != nil || community == nil {
+			continue
+		}
+		communities = append(communities, community)
+	}
+	return c.JSON(communities)
 }
 
 func (h *CommunityHandler) Create(c *fiber.Ctx) error {
@@ -92,6 +102,9 @@ func (h *CommunityHandler) Create(c *fiber.Ctx) error {
 	if err := h.communityRepo.SetMember(c.Context(), communityID, member); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to add owner as member"})
 	}
+
+	// ユーザーのコミュニティIDリストに追加
+	_ = h.userRepo.AddCommunityID(c.Context(), uid, communityID)
 
 	return c.Status(fiber.StatusCreated).JSON(community)
 }
@@ -208,6 +221,9 @@ func (h *CommunityHandler) Join(c *fiber.Ctx) error {
 	if err := h.communityRepo.SetMember(c.Context(), community.ID, member); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to join community"})
 	}
+
+	// ユーザーのコミュニティIDリストに追加
+	_ = h.userRepo.AddCommunityID(c.Context(), uid, community.ID)
 
 	return c.JSON(community)
 }

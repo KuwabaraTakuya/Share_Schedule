@@ -74,16 +74,14 @@ service cloud.firestore {
       }
 
       function canRead() {
-        if request.auth == null { return false; }
-        // 自分のイベントは常に読める
-        if request.auth.uid == resource.data.userId { return true; }
-        // コミュニティ公開設定のイベントはコミュニティメンバーが読める
-        if resource.data.visibility == 'community' {
-          let communityId = resource.data.communityId;
-          return communityId != null &&
-            exists(/databases/$(database)/documents/communities/$(communityId)/members/$(request.auth.uid));
-        }
-        return false;
+        return request.auth != null && (
+          request.auth.uid == resource.data.userId ||
+          (
+            resource.data.visibility == 'community' &&
+            resource.data.communityId != null &&
+            exists(/databases/$(database)/documents/communities/$(resource.data.communityId)/members/$(request.auth.uid))
+          )
+        );
       }
 
       allow read: if canRead();
